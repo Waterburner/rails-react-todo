@@ -17,7 +17,6 @@ function App() {
   }, []);
 
   const handleUpdate = (e: React.ChangeEvent<HTMLInputElement>, id: number) => {
-    console.log(e.target.checked, id);
     axios
       .put(`/api/v1/todos/${id}`, { todo: { done: e.target.checked } })
       .then((response) => {
@@ -30,12 +29,33 @@ function App() {
       });
   };
 
+  const handleCreate = (todoItem: string) => {
+    axios
+      .post("/api/v1/todos", { todo: { title: todoItem, done: false } })
+      .then((response) => {
+        setTodos((prev) => [response.data, ...prev]);
+      })
+      .catch((error) => console.error(error));
+  };
+
+  const handleDelete = (id: number) => {
+    axios
+      .delete(`/api/v1/todos/${id}`)
+      .then(() => setTodos((prev) => prev.filter((todo) => todo.id !== id)))
+      .catch((error) => console.error(error));
+  };
+
   return (
     <div className="App">
       <div className="header">
         <h1>Todo List</h1>
       </div>
-      <TodosContainer todos={todos} handleUpdate={handleUpdate} />
+      <TodosContainer
+        todos={todos}
+        handleUpdate={handleUpdate}
+        handleCreate={handleCreate}
+        handleDelete={handleDelete}
+      />
     </div>
   );
 }
